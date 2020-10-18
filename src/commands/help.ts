@@ -1,11 +1,11 @@
-import { Stores, CommandSystem } from "../types";
-import { Message, MessageEmbed } from "discord.js";
+import { MessageEmbed } from "discord.js"
+import { CommandFunction, CommandSystem } from "../types"
 
 export const helpCommand = (
   commands: CommandSystem,
   commandsByAlias: CommandSystem
-) => async (arg: string, _2: Stores, msg: Message) => {
-  const embded = new MessageEmbed();
+): CommandFunction => async (arg, _2, msg) => {
+  const embded = new MessageEmbed()
   if (!arg) {
     embded.setTitle("Quick Currencies Commands").setDescription(
       Array.from(Object.entries(commands)).reduce(
@@ -16,11 +16,11 @@ ${acc}
 `,
         ""
       )
-    );
+    )
   } else {
     if (commandsByAlias[arg]) {
-      const command = commandsByAlias[arg];
-      embded.setTitle(`${arg}`);
+      const command = commandsByAlias[arg]
+      embded.setTitle(`${arg}`)
       embded.setDescription(
         `
 Description:
@@ -39,10 +39,10 @@ Permissions:
 Requires Role:
     ${!!command.requiresRole}
 `
-      );
+      )
     } else {
-      throw new Error("Help: Unknown command");
+      throw new Error("Help: Unknown command")
     }
   }
-  await msg.channel.send(embded);
-};
+  await msg.channel.send(embded)
+}

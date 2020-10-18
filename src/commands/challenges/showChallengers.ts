@@ -1,15 +1,18 @@
-import { Message } from "discord.js";
-import { Stores } from "../../types";
+import { CommandFunction } from "../../types"
 
-export const showChallenges = async (
-  name: string,
-  { challengeStore }: Stores,
-  msg: Message
+export const showChallenges: CommandFunction = async (
+  name,
+  { challengeStore },
+  msg,
+  { guildId }
 ) => {
   if (name) {
-    const challenge = await challengeStore.specificChallengeStatus(name);
-    msg.channel.send(challenge);
+    const challenge = await challengeStore.specificChallengeStatus(
+      name,
+      guildId
+    )
+    msg.channel.send(challenge)
   } else {
-    await challengeStore.listChallenges(msg.channel);
+    await challengeStore.listChallenges(msg.channel, guildId)
   }
-};
+}

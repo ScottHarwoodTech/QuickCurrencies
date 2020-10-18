@@ -1,4 +1,4 @@
-import { TextChannel, MessageEmbed, DMChannel, NewsChannel } from "discord.js";
+import { DMChannel, MessageEmbed, NewsChannel, TextChannel } from "discord.js";
 import { Challenge } from "../models/challenge";
 
 const percentageMappings = [
@@ -19,9 +19,14 @@ const OVERFLOW_IMAGE =
   "https://cdn.discordapp.com/attachments/711291510414376970/725766604125896734/Progress_Bar_Overfill.png";
 
 export class ChallengeStore {
-  public async listChallenges(channel: TextChannel | DMChannel | NewsChannel) {
+  public async listChallenges(
+    channel: TextChannel | DMChannel | NewsChannel,
+    guildId: string
+  ) {
     // TODO dont send message here.
-    const challengeString = (await Challenge.find()).reduce(
+    const challenges = await Challenge({ guildId }).find();
+    console.log(challenges);
+    const challengeString = challenges.reduce(
       (c, data) =>
         `${c}${data.name}: \`${data.currentAmount}/${data.target}[${Math.floor(
           (data.currentAmount / data.target) * 100
@@ -36,9 +41,10 @@ export class ChallengeStore {
     );
   }
   public async specificChallengeStatus(
-    challengeName: string
+    challengeName: string,
+    guildId: string
   ): Promise<MessageEmbed> {
-    const challenge = await this.getChallenge(challengeName);
+    const challenge = await this.getChallenge(challengeName, guildId);
     const percent = challenge.currentAmount / challenge.target;
     return new MessageEmbed()
       .setTitle("Challenge Status!")
@@ -54,13 +60,22 @@ export class ChallengeStore {
       );
   }
 
-  private async getChallenge(challengeName: string): Promise<Challenge> {
-    const challenge = (await Challenge.find({ name: challengeName }))[0];
+  private async getChallenge(
+    challengeName: string,
+    guildId: string
+  ): Promise<Challenge> {
+    const challenge = (
+      await Challenge({ guildId }).find({ name: challengeName })
+    )[0];
     if (!challenge) throw new Error("Invalid Challenge Name");
     return challenge;
   }
-  public async addToChallenge(amount: number, challengeName: string) {
-    await Challenge.update(
+  public async addToChallenge(
+    amount: number,
+    challengeName: string,
+    guildId: string
+  ) {
+    await Challenge({ guildId }).update(
       { name: challengeName },
       { $inc: { currentAmount: amount } }
     );

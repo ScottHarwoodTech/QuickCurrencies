@@ -1,18 +1,19 @@
-import { Message, MessageEmbed } from "discord.js";
-import { Stores } from "../types";
+import { MessageEmbed } from "discord.js"
+import { CommandFunction } from "../types"
 
-export const myBalance = async (
+export const myBalance: CommandFunction = async (
   _: string,
-  { userStore, settingsStore }: Stores,
-  msg: Message
+  { userStore },
+  msg,
+  { settings, guildId }
 ) => {
   if (msg.member) {
-    const balance = await userStore.getMyBalance(msg.member.id);
+    const balance = await userStore.getMyBalance(msg.member.id, guildId)
     const embed = new MessageEmbed()
       .setTitle(`${msg.member.nickname || msg.member.displayName}'s Balance!`)
       .setDescription(
-        `You currently have: \n${balance}\n ${settingsStore.settings.currencyName}`
-      );
-    msg.channel.send(embed);
+        `You currently have: \n${balance}\n ${settings.currencyName}`
+      )
+    msg.channel.send(embed)
   }
-};
+}

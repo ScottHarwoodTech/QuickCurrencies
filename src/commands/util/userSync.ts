@@ -1,24 +1,23 @@
 import { Member } from "../../models/member";
-import { Stores } from "../../types";
+import { Stores, CommandFunction } from "../../types";
 import { Message, MessageEmbed } from "discord.js";
 
-export const userSync = async (
-  _1: string,
-  { settingsStore }: Stores,
-  msg: Message
+export const userSync: CommandFunction = async (
+  _1,
+  _stores,
+  msg,
+  { settings, guildId }
 ) => {
   if (!msg.guild) {
     throw new Error("Guild unreachable");
   }
   const serverMembers = msg.guild.members.cache
-    .filter(
-      (u) =>
-        !!u.roles.cache.find((r) => r.id === settingsStore.settings.ignoreRole)
-    )
+    .filter((u) => !!u.roles.cache.find((r) => r.id === settings.ignoreRole))
     .map((u) => u.id);
 
-  if (serverMembers) {
-    const dBids = (await Member.find()).map((u) => u._id);
+  if (serverMembers && msg.guild) {
+    const model = Member({ guildId });
+    const dBids = (await model.find()).map((u) => u.memberId);
 
     const usersToSave = serverMembers
       .reduce((acc, serverMember) => {
@@ -28,11 +27,11 @@ export const userSync = async (
           return [...acc, serverMember];
         }
       }, [] as string[])
-      .map((id) => ({ _id: id, currency: 1000 }));
+      .map((memberId) => ({ memberId, currency: 1000 }));
 
-    const result = await Member.insertMany(usersToSave);
-    const deleteResult = await Member.deleteMany({
-      _id: { $not: { $in: serverMembers } },
+    const result = await model.insertMany(usersToSave);
+    const deleteResult = await model.deleteMany({
+      memberId: { $not: { $in: serverMembers } },
     });
     await msg.channel.send(
       new MessageEmbed().setTitle("User Sync").setDescription(`
