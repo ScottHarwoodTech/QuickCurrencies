@@ -15,6 +15,15 @@ export const roleHandler = (src: string): string[] => {
     : [];
 }; //return array of ids from string;
 
+export const caseInsensitiveComparator = (key: string, dict: Record<string, any>): string => {
+  for (var k in dict) {
+    if (k.toLowerCase() == key.toLowerCase()) {
+      return k;
+    }
+  };
+  return "";
+}
+
 export const emojiHandler = (emojiString: string): string => {
   if (emojiString.startsWith("<")) {
     return emojiString.split(":")[2].replace(">", "");
