@@ -1,24 +1,28 @@
 // TODO ADD THIS FILE
 
-import { Stores } from "../types";
-import { Message, MessageEmbed } from "discord.js";
+import { Stores, Context, CommandFunction } from "../types"
+import { Message, MessageEmbed } from "discord.js"
 
-export const addPhoto = async (
-  photoString: string,
-  { userStore }: Stores,
-  msg: Message
+export const addPhoto: CommandFunction = async (
+  photoString,
+  { userStore },
+  msg,
+  { guildId }
 ) => {
-  const space = photoString.indexOf(" ");
-  let photoUrl;
-  let name;
-  if (space == -1) {
-    photoUrl = photoString;
-  } else {
-    photoUrl = photoString.substr(0, space);
-    name = photoString.substr(space + 1);
+  if (!msg.guild) {
+    throw new Error("Guild not found")
   }
-  await userStore.addPhoto(photoUrl, name);
+  const space = photoString.indexOf(" ")
+  let photoUrl
+  let name
+  if (space == -1) {
+    photoUrl = photoString
+  } else {
+    photoUrl = photoString.substr(0, space)
+    name = photoString.substr(space + 1)
+  }
+  await userStore.addPhoto(photoUrl, guildId, name)
   await msg.channel.send(
     new MessageEmbed().setTitle("Photo Added").setImage(photoUrl)
-  );
-};
+  )
+}

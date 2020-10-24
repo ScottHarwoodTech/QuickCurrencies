@@ -1,5 +1,5 @@
-import { Schema, model, Document } from "mongoose";
-import { roleHandler, emojiHandler } from "../util";
+import { Document, model, Schema } from "mongoose";
+import { emojiHandler, roleHandler } from "../util";
 export type Role = string;
 export interface Settings {
   role: Role;
@@ -65,15 +65,14 @@ export const settingsSetterSchema: { [key: string]: SettingType } = {
 
 const settingsSchema = new Schema<Settings>({
   _id: { type: String, required: true },
-  role: { type: String, required: true },
-  emoji: { type: String, required: true },
-  delim: { type: String, required: true },
-  currencyValue: { type: Number, required: true },
-  currencyName: { type: String, required: true },
-  photoBill: { type: Number, required: true },
-  backgroundAmount: { type: Number, required: true },
-  guildId: { type: String, required: false },
-  ignoreRole: { type: String, required: true },
+  role: { type: String, default: "CHANGE_ME" },
+  emoji: { type: String, default: "❤️" },
+  delim: { type: String, default: "=" },
+  currencyValue: { type: Number, default: 100 },
+  currencyName: { type: String, default: "Muns" },
+  photoBill: { type: Number, default: 1 },
+  backgroundAmount: { type: Number, default: 1 },
+  ignoreRole: { type: String, default: "CHANGE_ME" },
 });
 
 export const Settings = model<Settings & Document>("Settings", settingsSchema);

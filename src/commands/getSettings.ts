@@ -1,12 +1,13 @@
-import { Message, MessageEmbed } from "discord.js";
-import { Stores } from "../types";
+import { MessageEmbed } from "discord.js";
+import { CommandFunction } from "../types";
 
-export const getSettings = async (
-  _args: string,
-  { settingsStore }: Stores,
-  msg: Message
+export const getSettings: CommandFunction = async (
+  _args,
+  _stores,
+  msg,
+  { settings }
 ) => {
-  const clonedSettings = { ...settingsStore.settings };
+  const clonedSettings = { ...settings.toJSON() };
   clonedSettings.role = `<@&${clonedSettings.role}>`;
   clonedSettings.emoji = `<:${clonedSettings.emoji}:>`;
   const embed = new MessageEmbed()

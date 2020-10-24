@@ -1,16 +1,17 @@
-import { Message, MessageEmbed } from "discord.js";
-import { Stores } from "../../types";
+import { MessageEmbed } from "discord.js";
 import { Member } from "../../models/member";
+import { CommandFunction } from "../../types";
 
-export const getDifferentBank = async (
-  arg: string,
-  stores: Stores,
-  msg: Message
+export const getDifferentBank: CommandFunction = async (
+  memberId,
+  _stores,
+  msg,
+  { guildId }
 ) => {
-  const member = await Member.findById(arg);
+  const member = await Member({ guildId }).findOne({ memberId });
   console.log(member);
   if (!member) {
-    throw new Error(`Member ${arg} not found`);
+    throw new Error(`Member ${memberId} not found`);
   }
 
   await msg.channel.send(

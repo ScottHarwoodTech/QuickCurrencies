@@ -1,12 +1,13 @@
-import { Message, MessageEmbed } from "discord.js";
-import { Stores } from "../types";
+import { MessageEmbed } from "discord.js"
+import { CommandFunction } from "../types"
 
-export const leaderboard = async (
-  _: string,
-  { userStore }: Stores,
-  msg: Message
+export const leaderboard: CommandFunction = async (
+  _,
+  { userStore },
+  msg,
+  { guildId }
 ) => {
-  const topTen = await userStore.getTop(10);
+  const topTen = await userStore.getTop(10, guildId)
   const embed = new MessageEmbed()
     .setTitle("The richest people in the guild!")
     .setColor("#fc8c03")
@@ -15,7 +16,7 @@ export const leaderboard = async (
         (curr, record) => curr + `\n <@${record[0]}> | ${record[1]}`,
         ""
       )
-    );
+    )
 
-  await msg.channel.send(embed);
-};
+  await msg.channel.send(embed)
+}
