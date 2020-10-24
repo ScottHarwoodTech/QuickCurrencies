@@ -1,21 +1,18 @@
-import discord, { Message, ReactionManager } from "discord.js";
+import discord from "discord.js";
 import dotenv from "dotenv";
-dotenv.config();
-
-import { SettingsStore } from "./stores/settingsStore";
-import { UserStore } from "./stores/userStore";
-import { ChallengeStore } from "./stores/challengeStore";
-import logger from "./logger";
-
-import { commandParser, givenMoney, errorEvent } from "./util";
-
-import { commandsByAlias, prohibitedCommands } from "./commands";
 import express from "express";
+import { commandsByAlias, prohibitedCommands } from "./commands";
 import { db } from "./dbConnection";
-import { Member, TenantlessMember } from "./models/member";
-import { Settings } from "./models/settings";
+import logger from "./logger";
 import { TenantlessChallenge } from "./models/challenge";
 import { TenantlessImage } from "./models/image";
+import { Member, TenantlessMember } from "./models/member";
+import { Settings } from "./models/settings";
+import { ChallengeStore } from "./stores/challengeStore";
+import { SettingsStore } from "./stores/settingsStore";
+import { UserStore } from "./stores/userStore";
+import { commandParser, errorEvent, givenMoney } from "./util";
+dotenv.config();
 
 process.on("unhandledRejection", (reason) => {
   if (reason) {
@@ -151,11 +148,13 @@ async function Main() {
   });
 
   client.on("messageReactionAdd", async (reaction, user) => {
-    if (!reaction.message.guild) {
-      throw new Error("Guild Not found");
-    }
-    const settings = await settingsStore.getSettings(reaction.message.guild.id);
     try {
+      if (!reaction.message.guild) {
+        throw new Error("Guild Not found");
+      }
+      const settings = await settingsStore.getSettings(
+        reaction.message.guild.id
+      );
       logger.info(settings.ignoreRole);
       if (
         reaction.message.member?.roles.cache.find(
